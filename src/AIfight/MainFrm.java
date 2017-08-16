@@ -20,7 +20,7 @@ public class MainFrm {
         f.add(new WorldPanel(15));
         f.pack();
         
-        f.setSize(410,460);
+        f.setSize(810,860);
         f.setVisible(true);
         f.addNotify();
     }
@@ -33,11 +33,11 @@ class WorldPanel extends JPanel implements Runnable{
    private JLabel testLabel;
    private JPanel buttonPanel;
    
-   private final int PWIDTH = 410;
-   private final int PHEIGHT = 410;
+   private final int PWIDTH = 810;
+   private final int PHEIGHT = 810;
    
-   private final int SIMWIDTH = 400;
-   private final int SIMHEIGHT = 400;
+   private final int SIMWIDTH = 800;
+   private final int SIMHEIGHT = 800;
    
    private Thread animator;
    private boolean running = false;
@@ -49,7 +49,7 @@ class WorldPanel extends JPanel implements Runnable{
    private World sim1;
    
    private int selectX;    //the upper-left hand corner of the currently selected area of the screen
-   private int selectY;    
+   private int selectY;    //(wont be used until zooming in is a thing)
    
    private int stageSize;  //the size of the display area in display tiles
    private int tileSize;   //the size of each display square in pixels
@@ -80,7 +80,7 @@ class WorldPanel extends JPanel implements Runnable{
       MindTemplate contender2 = new ExampleHunter();
 
       sim1 = new World(this.stageSize,0,contender1, contender2);
-      sim1.initialize(3);
+      sim1.initialize(10);
    }
   
    private class ButtonListener implements ActionListener{
@@ -124,7 +124,7 @@ class WorldPanel extends JPanel implements Runnable{
             //sleepTime = 5;
             
          try {
-            Thread.sleep(10);
+            Thread.sleep(200);
          }catch(InterruptedException ex){}
          
          //beforeTime = System.currentTimeMillis();
