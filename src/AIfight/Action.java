@@ -1,6 +1,8 @@
 package AIfight;
 
 public enum Action{ //NEEDS TO BE BALANCED EVENTUALLY
+   //the following are the meanings of all the action numbers, vars
+   //resource cost, damage, defence buff, max eat ammount,xPos modifier, yPos modifier, effective area, single targeting) 
    ATTACK_U(10,50,0,0,0,0,0,AOE.UP,true),
    ATTACK_R(10,50,0,0,0,0,0,AOE.RIGHT,true),
    ATTACK_D(10,50,0,0,0,0,0,AOE.DOWN,true),
@@ -17,6 +19,7 @@ public enum Action{ //NEEDS TO BE BALANCED EVENTUALLY
    GRAZE(8,0,0,10,0,0,0,AOE.SURROUNDING,false),
    
    OBSERVE(20,0,0,0,0,0,50),           //the high cost is because of the performance cost. lots of additional scan area
+   
    //consider adding diagonal movement?
    MOVE_U(5,0,0,0,0,-1,0),
    MOVE_R(5,0,0,0,1,0,0),

@@ -25,6 +25,7 @@ public class ExampleHunter implements MindTemplate{
          int[] foodSmellSense = senses.getFoodSmellSense();
          int[] enemySmellSense = senses.getEnemySmellSense();
          
+         //look for enemies in attack range
          int dir = SensorSuite.findFirst(enemyTouchSense);      
          
          //attack anything nearby with extreme predjudice
@@ -33,24 +34,34 @@ public class ExampleHunter implements MindTemplate{
             this.creature.addAction(toDo);  
             this.creature.addAction(toDo);
             this.creature.addAction(toDo);
-            //this.color = Color.YELLOW;
+            this.color = Color.YELLOW;
             return;
          }
          
-         //10% debouncer (testing feature)
+         this.color = Color.RED;
+         
+         //no creatures adjacent. lets see if there are any big lumps of food lying around
          dir = SensorSuite.findGreatest(foodTouchSense);
+         
+         //eat any nearby food
          if(dir != -1 && foodTouchSense[dir] > 25){
             this.creature.addAction(Action.getEatAction(dir));
             return;
          }
          
+         //well, no creatures or food adjacent, lets try and smell a creature to hunt
          dir = SensorSuite.findGreatest(enemySmellSense);
+         
+         //move toward the nearest creature
          if(dir != -1){
             this.creature.addAction(Action.getMoveAction(dir));
             return;
          }
          
+         //could smell any creatures, lets just go park ourselves on the nearest food spot and wait for one
          dir = SensorSuite.findGreatest(foodSmellSense);
+         
+         //move toward the strongest food smell
          if(dir != -1)
             this.creature.addAction(Action.getMoveAction(dir));
    }

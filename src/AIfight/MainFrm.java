@@ -5,27 +5,46 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
 
-
-public class MainFrm {
-   private final String SECURE_KEY = "password";   //wont run unless this matched the one in Creature
-
-   public static void main(String[] args) {
-         createAndShowGUI();
-    }
-
-   private static void createAndShowGUI() {
-        JFrame f = new JFrame("AI Fight Simulator");
-        f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);        
-        
-        f.add(new WorldPanel(15));
-        f.pack();
-        
-        f.setSize(810,860);
-        f.setVisible(true);
-        f.addNotify();
-    }
-
+public class MainFrm extends JFrame{
+   public static void main(String[] args){
+      new MainFrm();
+   }
+   
+   public MainFrm(){     
+      this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+      WorldPanel simDisplay = new WorldPanel(15);      
+      this.setLayout(null);
+      
+      JButton pauseBtn = new JButton("Resume");
+      
+      pauseBtn.setBounds(simDisplay.PWIDTH,0,100,50);
+      simDisplay.setBounds(0,0,simDisplay.PWIDTH, simDisplay.PHEIGHT);
+      
+      pauseBtn.addActionListener(new ActionListener() { 
+         public void actionPerformed(ActionEvent e) { 
+            if(simDisplay.getIsRunning()){
+               simDisplay.setIsRunning(false);
+               pauseBtn.setText("Resume");
+            }
+            else{
+               simDisplay.setIsRunning(true);
+               pauseBtn.setText("Pasue");
+            }
+         } 
+      });
+      
+      
+      this.add(simDisplay);
+      this.add(pauseBtn);
+      
+      this.pack();
+      this.setSize(950, 860);
+      this.setVisible(true);
+   }
+  
 }
+
+
 
 class WorldPanel extends JPanel implements Runnable{
 
@@ -33,8 +52,8 @@ class WorldPanel extends JPanel implements Runnable{
    private JLabel testLabel;
    private JPanel buttonPanel;
    
-   private final int PWIDTH = 810;
-   private final int PHEIGHT = 810;
+   public final int PWIDTH = 810;
+   public final int PHEIGHT = 810;
    
    private final int SIMWIDTH = 800;
    private final int SIMHEIGHT = 800;
@@ -55,13 +74,6 @@ class WorldPanel extends JPanel implements Runnable{
    private int tileSize;   //the size of each display square in pixels
 
    public WorldPanel(int tileSize) {
-      testButton = new JButton("test button");
-      
-      buttonPanel = new JPanel();
-      buttonPanel.setLocation(400,0); //fuc, doesnt work
-      buttonPanel.setBackground (Color.orange);
-      buttonPanel.add(testButton);
-
       this.setBackground(Color.WHITE);
         
       setFocusable(true);
@@ -75,19 +87,15 @@ class WorldPanel extends JPanel implements Runnable{
          smallSize = SIMHEIGHT;
       
       this.stageSize = smallSize/tileSize;
-
+      
+      //set up two mind objects for the opposing players
       MindTemplate contender1 = new ExampleGrazer();
       MindTemplate contender2 = new ExampleHunter();
 
+      //create the simulation with the players
       sim1 = new World(this.stageSize,0,contender1, contender2);
+      //initialize the sim with 10 creatures for each player
       sim1.initialize(10);
-   }
-  
-   private class ButtonListener implements ActionListener{
-      public void actionPerformed(ActionEvent event){
-         Object choice = event.getSource();
-         System.out.println(choice);
-      }
    }
 
    public void addNotify(){
@@ -112,24 +120,28 @@ class WorldPanel extends JPanel implements Runnable{
    
       running = true;
       simPaint();
-      while(running){
-         simUpdate();
-         simRender();
-         simPaint();
-      
-         //timeDiff= System.currentTimeMillis() - beforeTime;
-         //sleepTime = period - timeDiff;
+      while(!simOver){
+         while(running){
+            simUpdate();
+            simRender();
+            simPaint();
          
-         //if(sleepTime <= 0)
-            //sleepTime = 5;
+            //timeDiff= System.currentTimeMillis() - beforeTime;
+            //sleepTime = period - timeDiff;
             
+            //if(sleepTime <= 0)
+               //sleepTime = 5;
+               
+            try {
+               Thread.sleep(200);
+            }catch(InterruptedException ex){}
+            
+            //beforeTime = System.currentTimeMillis();
+         }
          try {
-            Thread.sleep(200);
+            Thread.sleep(10);
          }catch(InterruptedException ex){}
-         
-         //beforeTime = System.currentTimeMillis();
       }
-      
       System.exit(0);
    }
    
@@ -150,13 +162,13 @@ class WorldPanel extends JPanel implements Runnable{
             dbg = dbImage.getGraphics();
       }
       dbg.setColor(Color.white);
-      dbg.fillRect (0, 0, SIMWIDTH, SIMHEIGHT);
+      dbg.fillRect (1, 1, SIMWIDTH-1, SIMHEIGHT-1);
       dbg.setColor(Color.black);
       dbg.drawRect (0, 0, SIMWIDTH, SIMHEIGHT);
       for (int y = 0; y < this.stageSize; y++){
          for(int x = 0; x < this.stageSize; x++){
             dbg.setColor(sim1.getColor(x,y));
-            dbg.fillRect(x * tileSize,y*tileSize,tileSize,tileSize);
+            dbg.fillRect(x * tileSize+1,y*tileSize+1,tileSize,tileSize);
          }
       }  
    }
@@ -182,10 +194,6 @@ class WorldPanel extends JPanel implements Runnable{
          if(dbImage != null)
             g.drawImage(dbImage, 0, 0, null); 
       }
-      //g.setColor(Color.RED);
-      //g.fillRect(squareX,squareY,squareW,squareH);
-      //g.setColor(Color.BLACK);
-      //g.drawRect(squareX,squareY,squareW,squareH);
    }
    
    public int getPwidth(){
@@ -195,4 +203,11 @@ class WorldPanel extends JPanel implements Runnable{
       return this.PHEIGHT;
    }
    
+   public void setIsRunning(boolean state){
+      this.running = state;
+   }
+   
+   public boolean getIsRunning(){
+      return this.running;
+   }
 }
